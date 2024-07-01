@@ -112,6 +112,7 @@ export default function GetProduct() {
         { courses &&
             <div>
                 <select onChange={(choice) => setUserChoice(choice.target.value)} name="courses">
+                  <option></option>
                     {courses.map((course, idx)=>{
                         return(
                             <option key={idx} value={course.id}>{course.name}</option>

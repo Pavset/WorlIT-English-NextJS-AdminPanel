@@ -48,8 +48,13 @@ export default function Users(){
     useEffect(()=>{getUsers()},[])
     return(
         <div>
-        <div class = "w-full h-16 bg-orange-600">
-            <p class = "font-normal text-white-500">Учень</p>
+        <div class = "flex w-full bg-orange-600 h-30 justify-around">
+            <p class = "font-medium text-xl text-white">Учені</p>
+            <Link class = "font-normal text-xl text-white underline hover:no-underline" href={`/courses`}>Курси</Link>
+            <Link class = "font-normal text-xl text-white underline hover:no-underline" href={`/staff`}>Вчителя</Link>
+            <Link class="font-normal text-xl text-white underline hover:no-underline" href={`/users`}>Учені</Link>
+            <Link class = "font-normal text-xl text-white underline hover:no-underline" href={`/modules`}>Модулі</Link>
+            <Link class = "font-normal text-xl text-white underline hover:no-underline" href={`//worldLists`}>Список слів</Link>
         </div>
         <div class = "flex flex-column justify-around">
             { usersIn &&

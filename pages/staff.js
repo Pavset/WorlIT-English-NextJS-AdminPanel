@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import Link from 'next/link'
-// import styles from "./page.module.css";
+import styles from "@/app/globals.css";
 
 export default function Staff(){
 
@@ -75,56 +75,84 @@ export default function Staff(){
       }
     useEffect(()=>{getStaff()},[])
     return(
-        <div >
-            <div>
-                
-            </div>
-            {staff &&
-            
-                <div>
-                    <p>name</p>
-                    <input type='text' value={name} onChange={(event)=>{
-                    setName(event.target.value)
-                    }}/>
-                    <p>surname</p>
-                    <input type='text' value={surname} onChange={(event)=>{
-                    setSurname(event.target.value)
-                    }}/>
-                    <p>phone</p>
-                   <input type='text' value={phone} onChange={(event)=>{
-                    setPhone(event.target.value)
-                    }}/>
-                    <p>tg</p>
-                    <input type='text' value={tg} onChange={(event)=>{
-                    setTg(event.target.value)
-                    }}/>
-                    <p>viber</p>
-                   <input type='text' value={viber} onChange={(event)=>{
-                    setViber(event.target.value)
-                    }}/>
-                    <p>image</p>
-                   <input type='text' value={image} onChange={(event)=>{
-                    setImage(event.target.value)
-                    }}/>
-                    <button onClick={()=>{ createStaff() }}>
-                    родить
-                    </button>
-                    {/* <p>{JSON.stringify(staff)}</p> */}
-                    { staff.map((s, idx)=>{
-                        return(
-                            
-                            <div key={idx} >
-                                <p>{s.id}</p>
-                                <p>{s.name}</p>
-                                <p>{s.surname}</p>
-                                <Link href={`/staff/${s.id}`}>
-                                    повна інформація
-                                </Link>
-                            </div>
-                        )
-                    })}
-                </div>
-            }
+    <div>
+        <div class="flex w-full bg-orange-600 h-30 justify-around">
+            <p class="font-medium text-xl text-white">Вчителі</p>
+            <Link class="font-normal text-xl text-white underline hover:no-underline" href={`/courses`}>Курси</Link>
+            <Link class="font-normal text-xl text-white underline hover:no-underline" href={`/staff`}>Вчителя</Link>
+            <Link class="font-normal text-xl text-white underline hover:no-underline" href={`/users`}>Учені</Link>
+            <Link class="font-normal text-xl text-white underline hover:no-underline" href={`/modules`}>Модулі</Link>
+            <Link class="font-normal text-xl text-white underline hover:no-underline" href={`/worldLists`}>Список слів</Link>
         </div>
-        
+        {staff && (
+            <div>
+                <p class = "font-large text-xl ">Створення вчителя</p>
+                <div class="flex flex-row bg-slate-300 py-8 gap-3">
+                    <div class="flex flex-col ml-5">
+                        <p>name</p>
+                        <input type="text" value={name} onChange={(event) => {
+                            setName(event.target.value)
+                        }} />
+                    </div>
+                    
+                    <div class="flex flex-col">
+                        <p>surname</p>
+                        <input type="text" value={surname} onChange={(event) => {
+                            setSurname(event.target.value)
+                        }} />
+                    </div>
+
+                    <div class="flex flex-col">
+                        <p>phone</p>
+                        <input type="text" value={phone} onChange={(event) => {
+                            setPhone(event.target.value)
+                        }} />
+                    </div>
+
+                    <div class="flex flex-col">
+                        <p>tg</p>
+                        <input type="text" value={tg} onChange={(event) => {
+                            setTg(event.target.value)
+                        }} />
+                    </div>
+
+                    <div class="flex flex-col">
+                        <p>viber</p>
+                        <input type="text" value={viber} onChange={(event) => {
+                            setViber(event.target.value)
+                        }} />
+                    </div>
+
+                    <div class="flex flex-col">
+                        <p>imageURL</p>
+                        <input type="text" value={image} onChange={(event) => {
+                            setImage(event.target.value)
+                        }} />
+                    </div>
+                    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => { createStaff() }}>
+                        Створити
+                    </button>
+                </div>
+                <div class = "mx-10">
+                <div class="columns-4 border-b-2 border-gray-200 py-4">
+                    <p class="font-normal">Ім'я</p>
+                    <p class="font-normal">Фамілія</p>
+                    <p class="font-normal">ID</p>
+                </div>
+                {staff.map((s, idx) => {
+                    return (
+                        <div class="columns-4 border-b-2 border-gray-200 py-4" key={idx} >
+                            <p class="font-normal">{s.id}</p>
+                            <p class="font-normal">{s.name}</p>
+                            <p class="font-normal">{s.surname}</p>
+                            <Link class="text-sky-600 hover:text-sky-300" href={`/staff/${s.id}`}>
+                                повна інформація
+                            </Link>
+                        </div>
+                    )
+                })}
+                </div>
+            </div>
+        )}
+    </div>
 )}

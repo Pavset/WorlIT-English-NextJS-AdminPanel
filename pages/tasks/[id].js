@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
-export default function GetProduct() {
+export default function GetTask() {
   const apiUrl = 'http://localhost:8000'
   const [task, setTask] = useState()
   const [questions, setQuestions] = useState()
@@ -12,6 +12,12 @@ export default function GetProduct() {
 
   const [createModalOpened, setCreateModalOpened] = useState()
   const [taskTypesChoice, setTaskTypesChoice] = useState(null)
+
+  const [mediaNew, setMediaNew] = useState(null)
+  const [taskUpdateType, setTaskUpdateType] = useState()
+  const [taskUpdateWordArray, setTaskUpdateWordArray] = useState()
+  const [taskUpdateInitialyBlocked, setTaskUpdateInitialyBlocked] = useState()
+  const [taskUpdateUnlockingTaskId, setTaskUpdateUnlockingTaskId] = useState()
   
 
   const [questionUpdateId,setQuestionUpdateId] = useState()
@@ -20,7 +26,15 @@ export default function GetProduct() {
   const [questionUpdateExtraText,setQuestionUpdateExtraText] = useState()
   const [questionUpdateImage,setQuestionUpdateImage] = useState()
   const [questionUpdateTrueAnswers,setQuestionUpdateTrueAnswers] = useState()
-  const [questionUpdateWrongAnswers,setQuestionUpdateWrongAnswers] = useState()
+  const [questionUpdateWrongAnswers,setQuestionUpdateWrongAnswers] = useState(
+    {
+        answer1: "",
+        answer2: "",
+        answer3: "",
+        answer4: "",
+        answer5: "",
+      }
+  )
 
 
   const [creationQuestionText, setCreationQuestionText] = useState()
@@ -107,7 +121,7 @@ export default function GetProduct() {
     .then(
       async (data) => {
         console.log(await data)
-        router.push('/tasks')
+        router.push('/modules')
       }
     );
   }
@@ -148,6 +162,46 @@ export default function GetProduct() {
     
     }
 
+    // function updateTask(){
+    //     let body = {
+    //         wordArray: taskUpdateWordArray,
+    //         initialyBlocked: taskUpdateInitialyBlocked,
+    //         unlockingTaskId: taskUpdateUnlockingTaskId,
+    //         type: taskUpdateType
+    //     } 
+    //     if(task.type == "video"){
+    //         body = {
+    //             video: mediaNew
+    //         }
+    //     } else if (task.type == "audio"){
+    //         body = {
+    //             audio: mediaNew
+    //         }
+    //     }
+
+
+    //     console.log(taskTypesChoice)
+    //     fetch(`${apiUrl}/task/${id}`,{
+    //         method: "PUT",
+    //         headers: {
+    //             "token": `${value}`,
+    //             Accept: 'application/json',
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify(body)
+    //     })
+    //     .then((response) => response.json())
+    //     .then(
+    //       async (data) => {
+    //         if(!data.error){
+    //           console.log(await data)
+    //           getTasksInfo()
+    //       } else{
+    //           console.error(data.error)
+    //       }
+    //       }
+    //     );
+    //   }
 
     console.log(taskTypesChoice)
     fetch(`${apiUrl}/question`,{
@@ -181,45 +235,45 @@ export default function GetProduct() {
     );
   }
 
-  function updateQuestion(questionId){
-    let questionTrueList = []
-    let questionWrongList = []
-    let extraQuestionText
-    let questionText
-    let questionImage = null
+//   function updateQuestion(questionId){
+//     let questionTrueList = []
+//     let questionWrongList = []
+//     let extraQuestionText
+//     let questionText
+//     let questionImage = null
 
-    if(creationImage){
-        questionImage = creationImage
-    }
+//     if(creationImage){
+//         questionImage = creationImage
+//     }
 
-    console.log(taskTypesChoice)
-    fetch(`${apiUrl}/question/${questionId}`,{
-        method: "PUT",
-        headers: {
-            "token": `${value}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            question: questionText,
-            imagePath: questionImage,
-            trueAnswers: questionTrueList,
-            wrongAnswers: questionWrongList,
-            extraQuestionText: extraQuestionText,
-        })
-    })
-    .then((response) => response.json())
-    .then(
-      async (data) => {
-        if(!data.error){
-          console.log(await data)
-          getTasksInfo()
-      } else{
-          console.error(data.error)
-      }
-      }
-    );
-  }
+//     console.log(taskTypesChoice)
+//     fetch(`${apiUrl}/question/${questionId}`,{
+//         method: "PUT",
+//         headers: {
+//             "token": `${value}`,
+//             Accept: 'application/json',
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//             question: questionText,
+//             imagePath: questionImage,
+//             trueAnswers: questionTrueList,
+//             wrongAnswers: questionWrongList,
+//             extraQuestionText: extraQuestionText,
+//         })
+//     })
+//     .then((response) => response.json())
+//     .then(
+//       async (data) => {
+//         if(!data.error){
+//           console.log(await data)
+//           getTasksInfo()
+//       } else{
+//           console.error(data.error)
+//       }
+//       }
+//     );
+//   }
 
   function delQuestion(questionId){
     fetch(`${apiUrl}/question/${questionId}`, {
@@ -272,12 +326,38 @@ export default function GetProduct() {
                 <br/>
                 {task.type == "video" &&
                     <div>
-                        {task.video}
+                        <video src={task.video} controls>
+                          <p>
+                            Your browser doesn't support HTML video. Here is a
+                            <a href={task.video}>link to the video</a> instead.
+                          </p>
+                        </video>
+                        <div>
+                            <input type="text" value={mediaNew} onChange={(e)=>{setMediaNew(task.id)(e.target.value)}} placeholder="Ссылка на видео"/>
+                            {/* <button onClick={()=>{ changeTask() }}>
+                                Змінити відео
+                            </button> */}
+                            <button onClick={()=>{ removeTask() }}>
+                                Видалити відео
+                            </button>
+                        </div>
                     </div>
                 }
                 {task.type == "audio" &&
                     <div>
-                        {task.audio}
+                        <audio controls src={task.audio}>
+                            <a href={task.audio}> Download audio </a>
+                        </audio>
+                        <div>
+                            <input type="text" value={mediaNew} onChange={(e)=>{setMediaNew(task.id)(e.target.value)}} placeholder="Ссылка на аудіо"/>
+                            {/* <button onClick={()=>{ changeTask() }}>
+                                Змінити аудіо
+                            </button> */}
+                            <button onClick={()=>{ removeTask() }}>
+                                Видалити аудіо
+                            </button>
+
+                        </div>
                     </div>
                 }
                 {task.type != "audio" && task.type != "video" &&
@@ -365,7 +445,31 @@ export default function GetProduct() {
                         <button onClick={()=>{setCreateModalOpened(true)}}>
                             створити питання
                         </button>
-
+                        <button onClick={()=>{ removeTask() }}>
+                            Видалити Таску повністю
+                        </button>
+                        {/* <div>
+                            <select onChange={(e)=>{ setTaskUpdateType(e.target.value) }}>
+                              <option></option>
+                              <option value="test">test</option>
+                              <option value="words">words</option>
+                              <option value="routes">routes</option>
+                              <option value="sentence">sentence</option>
+                            </select>
+                            {wordLists &&
+                                <select onChange={(e)=>{ setTaskUpdateWordArray(e.target.value) }}>
+                                    <option></option>
+                                    {wordLists.map((list, idx)=>{
+                                        return(
+                                            <option key={idx} value={list.id}>{list.name}</option>
+                                        )
+                                    })}
+                                </select>
+                            }
+                            <button onClick={()=>{ changeTask() }}>
+                                Змінити таску
+                            </button>
+                        </div> */}
                     {/* {questionUpdateId &&
                         <div>
                             <h1>Оновлення питання</h1>

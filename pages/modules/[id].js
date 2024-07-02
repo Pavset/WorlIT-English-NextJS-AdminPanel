@@ -1,3 +1,4 @@
+"use client"
 
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
@@ -7,10 +8,22 @@ export default function GetProduct() {
   const apiUrl = 'http://localhost:8000'
   const [module, setModule] = useState()
   const [topics, setTopics] = useState()
+  const [wordLists, setWordLists] = useState()
+
   const [nameChanged, setNameChanged] = useState()
-//   const [homeworks, setHomeworks] = useState()
+  const [theoryCreationName, setTheoryCreationName] = useState()
+  const [creationTopicId, setCreationTopicId] = useState()
+  const [tasksWordListId, setTasksWordListId] = useState()
+  const [tasksType, setTasksType] = useState()
+  const [notHomework, setNotHomework] = useState()
+
+
 //   const [tasks, setTasks] = useState()
 //   const [theory, setTheories] = useState()
+
+  const [openTheoryModal ,setOpenTheoryModal] = useState(false)
+  const [openTasksModal ,setOpenTasksModal] = useState(false)
+  const [openHomeModal ,setOpenHomeModal] = useState(false)
 
 
   const [cookies, setCookie] = useCookies(['token'])
@@ -37,7 +50,26 @@ export default function GetProduct() {
           console.log(data)
       } else{
           console.error(data.error)
-          router.push('/modules')
+      }
+      }
+    );
+  }
+
+  function getWordLists() {
+    fetch(`${apiUrl}/wordList`,{
+        method: "GET",
+        headers: {
+            "token": `${value}`,
+        }
+    })
+    .then((response) => response.json())
+    .then(
+      async (data) => {
+        if(!data.error){
+          setWordLists(await data.wordLists)
+          console.log(data.wordLists)
+      } else{
+          console.error(data.error)
       }
       }
     );
@@ -70,8 +102,7 @@ export default function GetProduct() {
     },
     body: JSON.stringify({   
         name: nameChanged,
-    })
-    })
+    })})
     .then((response) => response.json())
     .then(
       async (data) => {
@@ -80,7 +111,58 @@ export default function GetProduct() {
       }
     );
   }
+
+  function createTheory(){
+    console.log(theoryCreationName)
+    console.log(creationTopicId)
+    fetch(`${apiUrl}/theory`, {
+      method: "POST",
+      headers: {
+        "token": `${value}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({   
+        name: theoryCreationName,
+        topicId: creationTopicId
+    })})
+    .then((response) => response.json())
+    .then(
+      async (data) => {
+        console.log(data)
+        router.push(`/theories/${data.theory.id}`)
+      }
+    );
+  }
+
+  function createTask(){
+    console.log(tasksType)
+    console.log(tasksWordListId)
+    fetch(`${apiUrl}/task`, {
+      method: "POST",
+      headers: {
+        "token": `${value}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({   
+        type: tasksType,
+        wordArray: tasksWordListId,
+        topicId: creationTopicId,
+        notHomework: notHomework
+    })})
+    .then((response) => response.json())
+    .then(
+      async (data) => {
+        console.log(data)
+        // router.push(`/tasks/${data.task.id}`)
+      }
+    );
+  }
+
   useEffect(()=>{if (router.asPath !== router.route) {getModulesInfo()}},[router])
+  useEffect(()=>{getWordLists()},[])
+
   return( 
     <div>
         { module && 
@@ -93,9 +175,42 @@ export default function GetProduct() {
 
         </div>
         }
+        {openTheoryModal &&
+          <div>
+            <h1>Модальне окно додавання теорії</h1>
+            <input type="text" value={theoryCreationName} onChange={(e)=>{ setTheoryCreationName(e.target.value) }} placeholder="Назва теорії"/>
+            <button onClick={()=>{ createTheory() }}>Створити теорію</button>
+          </div>
+        }
+        {openTasksModal &&
+          <div>
+            <h1>Модальне окно додавання таски</h1>
+            <select onChange={(e)=>{ setTasksType(e.target.value) }}>
+              <option></option>
+              <option value="video">video</option>
+              <option value="test">test</option>
+              <option value="words">words</option>
+              <option value="routes">routes</option>
+              <option value="sentence">sentence</option>
+              <option value="audio">audio</option>
+            </select>
+            {wordLists &&
+              <select onChange={(e)=>{ setTasksWordListId(e.target.value) }}>
+                <option></option>
+                {wordLists.map((list, idx)=>{
+                  return(
+                    <option key={idx} value={list.id}>{list.name}</option>
+                  )
+                })}
+              </select>
+            }
+            <button onClick={()=>{ createTask() }}>Створити теорію</button>
+          </div>
+        }
         { topics && 
         <div>
             {topics.map((topic, idx)=>{
+
                 let homeworks = topic.homework
                 let tasks = topic.tasks
                 let theories = topic.theories
@@ -127,6 +242,13 @@ export default function GetProduct() {
                                         <button key={theoryIdx} onClick={()=>{ router.push(`/theories/${theory.id}`) }}>{theory.name} {theory.mainName}</button>
                                     )
                                 })}
+                                <button onClick={()=>{ 
+                                  setOpenTheoryModal(true) 
+                                  console.log(topic.topicId)
+                                  setCreationTopicId(topic.topicId)
+                                  
+                                }}>Додати теорію</button>
+
                             </div>
                         }
 
@@ -161,9 +283,16 @@ export default function GetProduct() {
                                         counter = tasksAudioCounter
                                       }
                                     return(
-                                        <button key={taskIdx} onClick={()=>{ router.push(`/tasks/${task.id}`) }}>{task.type}{counter}</button>
+                                        <button key={taskIdx} onClick={()=>{ router.push(`/tasks/${task.id}`) }}>{task.type} {counter}</button>
                                     )
                                 })}
+                                <button onClick={()=>{ 
+                                  setOpenTasksModal(true) 
+                                  console.log(topic.topicId)
+                                  setCreationTopicId(topic.topicId)
+                                  setNotHomework(true)
+                                }}>Додати таску</button>
+                                
                             </div>    
                         }
 
@@ -198,9 +327,15 @@ export default function GetProduct() {
                                         counter = homeAudioCounter
                                       }                                    
                                     return(
-                                        <button key={homeIdx} onClick={()=>{ router.push(`/tasks/${home.id}`) }}>{home.type}{counter}</button>
+                                        <button key={homeIdx} onClick={()=>{ router.push(`/tasks/${home.id}`) }}>{home.type} {counter}</button>
                                     )
                                 })}
+                                <button onClick={()=>{ 
+                                  setOpenTasksModal(true) 
+                                  console.log(topic.topicId)
+                                  setCreationTopicId(topic.topicId)
+                                  setNotHomework(false)
+                                }}>Додати дз</button>
                             </div>
                         }
 
@@ -209,12 +344,6 @@ export default function GetProduct() {
                 )
 
             })}
-            <h3>Ім'я: {module.name}</h3>
-
-            <button onClick={() => removeModule()}>
-                Видалити модуль повністю
-            </button>
-
         </div>
         }
     </div>

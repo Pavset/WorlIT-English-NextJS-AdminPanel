@@ -6,8 +6,10 @@ import { useCookies } from 'react-cookie';
 export default function GetTheory() {
   const apiUrl = 'http://localhost:8000'
   const [theory, setTheory] = useState()
+  const [newTheoryTitle, setNewTheoryTitle] = useState()
 
-  const [sections, setSections] = useState()
+
+  const [sections, setSections] = useState([])
   const [sectionId, setSectionId] = useState()
   const [sectionCreate, setSectionCreate] = useState(false)
 
@@ -37,13 +39,16 @@ export default function GetTheory() {
     .then((response) => response.json())
     .then(
       async (data) => {
+        
         if(!data.error){
           setTheory(await data.info)
-          setSections(await data.sections)
+          if(await data.sections){
+            setSections(await data.sections)
+          }
           console.log(data)
       } else{
           console.error(data.error)
-        //   router.push('/theorys')
+          router.push('/modules')
       }
       }
     );
@@ -53,14 +58,42 @@ export default function GetTheory() {
     fetch(`${apiUrl}/theory/${id}` ,{
         method: "DELETE",
         headers: {
-            "token": `${value}`
-        }
+          "token": `${value}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({   
+          title: newSectionTitle,
+          text: newSectionText,
+          imagePath: newSectionImage,
+      })
     })
     .then((response) => response.json())
     .then(
       async (data) => {
         console.log(await data)
-        router.push('/theorys')
+        router.push('/modules')
+      }
+    );
+  }
+
+  function changeTheory(){
+    fetch(`${apiUrl}/theory/${id}` ,{
+        method: "PUT",
+        headers: {
+          "token": `${value}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({   
+          name: newTheoryTitle,
+      })
+    })
+    .then((response) => response.json())
+    .then(
+      async (data) => {
+        console.log(await data)
+        getTheorysInfo()
       }
     );
   }
@@ -139,31 +172,50 @@ export default function GetTheory() {
     );
   }
 
-  function replaceHighlighting(text){
+  function replaceHighlighting(text) {
     const regex = /~(.*?)~/g;
+    const regexForBreaks = /[\r\n]+/g;
   
-    // Using regular expression to replace ~...~ with <Text> components in React Native
+    // This array will hold the resulting elements
     const parts = [];
     let lastIndex = 0;
   
+    // First replace the ~...~ with <strong> elements
     text.replace(regex, (match, p1, offset) => {
       // Add text up to the current match
       if (offset > lastIndex) {
-        parts.push(text.substring(lastIndex, offset));
+        const subText = text.substring(lastIndex, offset);
+        // Split the subText by line breaks and add <br/> accordingly
+        subText.split(regexForBreaks).forEach((segment, index, array) => {
+          if (segment) {
+            parts.push(segment);
+          }
+          if (index < array.length - 1) {
+            parts.push(<br />);
+          }
+        });
       }
-      // Add the selected text as a <Text> component
-      parts.push(<strong >{p1.trim()}</strong>);
-      // Updating the last index
+      // Add the selected text as a <strong> component
+      parts.push(<strong key={offset}>{p1.trim()}</strong>);
+      // Update the last index
       lastIndex = offset + match.length;
     });
   
-    // Add the remaining text after the last match
+    // Handle any remaining text after the last match
     if (lastIndex < text.length) {
-      parts.push(text.substring(lastIndex));
+      const remainingText = text.substring(lastIndex);
+      remainingText.split(regexForBreaks).forEach((segment, index, array) => {
+        if (segment) {
+          parts.push(segment);
+        }
+        if (index < array.length - 1) {
+          parts.push(<br />);
+        }
+      });
     }
   
     return parts;
-  };
+  }
 
   function modalOpen(){
     
@@ -179,7 +231,10 @@ export default function GetTheory() {
             <button onClick={() => removeTheory()}>
                 Видалити теорію
             </button>
-
+            <div>
+              <input onChange={( e ) => {setNewTheoryTitle(e.target.value)}} placeholder="Нова назва"/>
+              <button onClick={() => {changeTheory()} }>змінити назву теорії</button>
+            </div>
         </div>
         }
         {sections &&

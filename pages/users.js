@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import Link from 'next/link'
+import styles from "@/app/globals.css";
 
 export default function Users(){
     // const apiUrl = 'https://worlit-english-app-api.onrender.com'
@@ -47,16 +48,25 @@ export default function Users(){
     useEffect(()=>{getUsers()},[])
     return(
         <div>
+        <div class = "w-full h-16 bg-orange-600">
+            <p class = "font-normal text-white-500">Учень</p>
+        </div>
+        <div class = "flex flex-column justify-around">
             { usersIn &&
-                <div>
-                    <h1>Учні у курсі</h1>
+                <div class = "">
+                    <p class = "font-bold text-lg">Учні у курсі</p>
+                    <div class="columns-4 border-b-2 border-gray-200 py-4" >
+                        <p class = "font-normal">Ім'я</p>
+                        <p class = "font-normal">Фамілія</p>
+                        <p class = "font-normal">Вік</p>
+                    </div>
                     { usersIn.map((user, idx)=>{
                         return(
-                            <div key={idx} >
-                                <h2>{user.name}</h2>
-                                <h2>{user.surname}</h2>
-                                <h2>{user.yearsOld}</h2>
-                                <Link href={`/users/${user.id}`}>
+                            <div class="columns-4 border-b-2 border-gray-200 py-4" key={idx} >
+                                <p class = "font-normal">{user.name}</p>
+                                <p class = "font-normal">{user.surname}</p>
+                                <p class = "font-normal">{user.yearsOld}</p>
+                                <Link class="text-sky-600 hover:text-sky-300" href={`/users/${user.id}`}>
                                     повна інформація
                                 </Link>
                             </div>
@@ -65,15 +75,20 @@ export default function Users(){
                 </div>
             }
             { usersNotIn &&
-                <div>
-                    <h1>Учні не у курсі</h1>
+                <div class = "">
+                    <p class = "font-bold text-lg">Учні не у курсі</p>
+                    <div class="columns-4 border-b-2 border-gray-200 py-4">
+                        <p class = "font-normal">Ім'я</p>
+                        <p class = "font-normal">Фамілія</p>
+                        <p class = "font-normal">Вік</p>
+                    </div>
                     { usersNotIn.map((user, idx)=>{
                         return(
-                            <div key={idx} >
-                                <h2>{user.name}</h2>
-                                <h2>{user.surname}</h2>
-                                <h2>{user.yearsOld}</h2>
-                                <Link href={`/users/${user.id}`}>
+                            <div class="columns-4 border-b-2 border-gray-200 py-4" key={idx} >
+                                <p class = "font-normal">{user.name}</p>
+                                <p class = "font-normal">{user.surname}</p>
+                                <p class = "font-normal">{user.yearsOld}</p>
+                                <Link class="text-sky-600 hover:text-sky-300" href={`/users/${user.id}`}>
                                     повна інформація
                                 </Link>
                             </div>
@@ -81,6 +96,7 @@ export default function Users(){
                     })}
                 </div>
             }
+        </div>
         </div>
     )
 }
